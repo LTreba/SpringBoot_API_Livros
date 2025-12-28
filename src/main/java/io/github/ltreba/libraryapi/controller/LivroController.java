@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class LivroController implements GenericController {
     private LivroMapper livroMapper;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<Object> salvar(@RequestBody @Valid CadastroLivroDTO dto) {
         Livro livro = livroMapper.toEntity(dto);
         livroService.salvar(livro);
@@ -32,6 +34,7 @@ public class LivroController implements GenericController {
 
 
     @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<PesquisaLivroDTO> obterDetalhes(@PathVariable("id") String id) {
         return livroService.obterLivroPorId(UUID.fromString(id))
                 .map(livro -> {
@@ -42,6 +45,7 @@ public class LivroController implements GenericController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<Object> deletar(@PathVariable("id") String id) {
         return livroService.obterLivroPorId(UUID.fromString(id)).map(livro -> {
             livroService.deletar(livro);
@@ -50,6 +54,7 @@ public class LivroController implements GenericController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<Page<PesquisaLivroDTO>> pesquisa(@RequestParam(value = "titulo", required = true) String titulo, @RequestParam(value = "isbn", required = true) String isbn, @RequestParam(value = "nome-autor", required = true) String nomeaAutor, @RequestParam(value = "genero", required = true) GeneroLivro generoLivro, @RequestParam(value = "ano-publicacao", required = true) Integer anoPublicacao, @RequestParam(value = "pagina", defaultValue = "0") Integer pagina, @RequestParam(value = "tamanho-pagina", defaultValue = "10") Integer tamanhoPagina){
         var resultado = livroService.pesquisa(titulo, isbn, nomeaAutor, generoLivro, anoPublicacao, pagina, tamanhoPagina);
         Page<PesquisaLivroDTO> resultadoPaginas = resultado.map(livroMapper::toDTO);
@@ -57,6 +62,7 @@ public class LivroController implements GenericController {
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<Object> atualizar(@PathVariable("id") String id, @RequestBody @Valid CadastroLivroDTO dto){
         return livroService.obterLivroPorId(UUID.fromString(id))
                 .map(livro -> {

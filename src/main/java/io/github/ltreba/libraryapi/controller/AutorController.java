@@ -3,10 +3,15 @@ package io.github.ltreba.libraryapi.controller;
 import io.github.ltreba.libraryapi.controller.dto.AutorDTO;
 import io.github.ltreba.libraryapi.controller.mappers.AutorMapper;
 import io.github.ltreba.libraryapi.model.Autor;
+import io.github.ltreba.libraryapi.model.Usuario;
 import io.github.ltreba.libraryapi.service.AutorService;
+import io.github.ltreba.libraryapi.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,10 +27,18 @@ public class AutorController implements GenericController {
     private AutorService autorService;
     @Autowired
     private AutorMapper autorMapper;
+    @Autowired
+    private UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<Object> salvarAutor(@RequestBody @Valid AutorDTO dto) {
+    @PreAuthorize("hasRole('GERENTE')")
+    public ResponseEntity<Object> salvarAutor(@RequestBody @Valid AutorDTO dto, Authentication authentication) {
+
+        UserDetails usuarioLogado =  (UserDetails) authentication.getPrincipal();
+        Usuario usuario = usuarioService.obterPorLogin(usuarioLogado.getUsername());
+
         Autor autor = autorMapper.toEntity(dto);
+        autor.setUsuario(usuario);
         autorService.salvar(autor);
         var url = gerarHeaderLocation(autor.getId());
 
@@ -33,6 +46,7 @@ public class AutorController implements GenericController {
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<AutorDTO> getAutor(@PathVariable String id) {
         var idAutor = UUID.fromString(id);
 
@@ -46,6 +60,7 @@ public class AutorController implements GenericController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<Object> deletar(@PathVariable String id) {
         var idAutor = UUID.fromString(id);
 
@@ -59,6 +74,7 @@ public class AutorController implements GenericController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<List<AutorDTO>> pesquisar(@RequestParam(required = false) String nome, @RequestParam(required = false) String nacionalidade) {
         List<Autor> autores = autorService.pesquisa(nome, nacionalidade);
         List<AutorDTO> autoresDTOs = autores.stream()
@@ -69,6 +85,7 @@ public class AutorController implements GenericController {
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<Object> atualizarAutor(@PathVariable String id, @RequestBody @Valid AutorDTO dto) {
         var idAutor = UUID.fromString(id);
 
