@@ -1,6 +1,7 @@
 package io.github.ltreba.libraryapi.config;
 
 import io.github.ltreba.libraryapi.security.CustomUserDetailsService;
+import io.github.ltreba.libraryapi.security.LoginSocialSuccessHandler;
 import io.github.ltreba.libraryapi.service.UsuarioService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSuccessHandler loginSocialSuccessHandler) throws Exception {
         return(http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(Customizer.withDefaults())
@@ -31,6 +32,9 @@ public class SecurityConfiguration {
                             authorize.requestMatchers(HttpMethod.POST,"/usuarios/**").permitAll();
                             authorize.anyRequest().authenticated();
                         })
+                .oauth2Login(oauth2 -> {
+                    oauth2.successHandler(loginSocialSuccessHandler);
+                })
                 .build());
     }
 
@@ -39,7 +43,7 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder(10);
     }
 
-    @Bean
+    //@Bean
     public UserDetailsService userDetailsService(UsuarioService usuarioService) {
         return(new CustomUserDetailsService(usuarioService));
     }

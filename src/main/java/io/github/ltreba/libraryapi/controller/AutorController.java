@@ -4,6 +4,7 @@ import io.github.ltreba.libraryapi.controller.dto.AutorDTO;
 import io.github.ltreba.libraryapi.controller.mappers.AutorMapper;
 import io.github.ltreba.libraryapi.model.Autor;
 import io.github.ltreba.libraryapi.model.Usuario;
+import io.github.ltreba.libraryapi.security.CustomAuthentication;
 import io.github.ltreba.libraryapi.service.AutorService;
 import io.github.ltreba.libraryapi.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,9 +35,12 @@ public class AutorController implements GenericController {
     @PostMapping
     @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<Object> salvarAutor(@RequestBody @Valid AutorDTO dto, Authentication authentication) {
-
-        UserDetails usuarioLogado =  (UserDetails) authentication.getPrincipal();
-        Usuario usuario = usuarioService.obterPorLogin(usuarioLogado.getUsername());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioLogado = null;
+        if(auth instanceof CustomAuthentication customAuth) {
+            usuarioLogado = customAuth.getUsuario();
+        }
+        Usuario usuario = usuarioLogado;
 
         Autor autor = autorMapper.toEntity(dto);
         autor.setUsuario(usuario);

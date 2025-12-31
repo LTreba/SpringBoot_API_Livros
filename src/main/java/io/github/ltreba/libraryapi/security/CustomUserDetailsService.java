@@ -3,7 +3,6 @@ package io.github.ltreba.libraryapi.security;
 import io.github.ltreba.libraryapi.model.Usuario;
 import io.github.ltreba.libraryapi.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

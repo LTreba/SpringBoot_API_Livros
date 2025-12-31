@@ -44,7 +44,7 @@ public class Livro {
     @LastModifiedDate
     @Column(name="data_atualizacao")
     private LocalDateTime dataAtualizacao;
-    @Column(name="id_usuario")
-    private UUID idUsuario;
+    @JoinColumn(name="usuario")
+    private Usuario usuario;
 
 }

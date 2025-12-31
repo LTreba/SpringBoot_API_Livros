@@ -5,12 +5,16 @@ import io.github.ltreba.libraryapi.controller.dto.PesquisaLivroDTO;
 import io.github.ltreba.libraryapi.controller.mappers.LivroMapper;
 import io.github.ltreba.libraryapi.model.GeneroLivro;
 import io.github.ltreba.libraryapi.model.Livro;
+import io.github.ltreba.libraryapi.model.Usuario;
+import io.github.ltreba.libraryapi.security.CustomAuthentication;
 import io.github.ltreba.libraryapi.service.LivroService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -26,7 +30,15 @@ public class LivroController implements GenericController {
     @PostMapping
     @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<Object> salvar(@RequestBody @Valid CadastroLivroDTO dto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioLogado = null;
+        if(auth instanceof CustomAuthentication customAuth) {
+            usuarioLogado = customAuth.getUsuario();
+        }
+        Usuario usuario = usuarioLogado;
+
         Livro livro = livroMapper.toEntity(dto);
+        livro.setUsuario(usuarioLogado);
         livroService.salvar(livro);
         var url = gerarHeaderLocation(livro.getId());
         return(ResponseEntity.created(url).build());
