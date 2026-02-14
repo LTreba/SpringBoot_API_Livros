@@ -1,6 +1,8 @@
 spring:
   application:
     name: libraryapi
+  output:
+    ansi: ALWAYS
   datasource:
     url: jdbc:postgresql://localhost:5432/library
     username: postgres
@@ -16,9 +18,25 @@ spring:
         registration:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
-            client-secret:
+            client-secret: ${GOOGLE_CLIENT_SECRET}
 
-
+logging:
+  file:
+    name: app.log
+  level:
+    root: warn
+    org:
+      springframework:
+        web: debug
+        security: trace
 
 springdoc:
-  override-with-generic-response: false
+  override-with-generic-response:
+
+management:
+  server:
+    port: 9090
+  endpoints:
+    web:
+      exposure:
+        include: '*'
