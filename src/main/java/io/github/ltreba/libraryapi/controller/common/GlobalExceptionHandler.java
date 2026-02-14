@@ -7,7 +7,6 @@ import io.github.ltreba.libraryapi.exceptions.CampoInvalidoException;
 import io.github.ltreba.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.ltreba.libraryapi.exceptions.RegistroDuplicadoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

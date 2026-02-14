@@ -1,6 +1,7 @@
 package io.github.ltreba.libraryapi.security;
 
 import io.github.ltreba.libraryapi.model.Usuario;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
@@ -18,8 +19,12 @@ public class CustomAuthentication implements Authentication {
     private final Usuario usuario;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.usuario.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).collect(Collectors.toList());
+    public Collection<GrantedAuthority> getAuthorities() {
+        return this.usuario
+                .getRoles()
+                .stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
     @Override
