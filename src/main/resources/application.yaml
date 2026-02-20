@@ -3,10 +3,12 @@ spring:
     name: libraryapi
   output:
     ansi: ALWAYS
+  profiles:
+    active: production
   datasource:
-    url: jdbc:postgresql://localhost:5432/library
-    username: postgres
-    password: postgres
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/library}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
@@ -39,4 +41,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include:
